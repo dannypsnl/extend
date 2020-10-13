@@ -20,3 +20,8 @@ type ExtBlock struct {
 func (e *ExtBlock) HasTerminator() bool {
 	return e.Term != nil
 }
+
+// BelongsToFunc checks the parent function exists or not
+func (e *ExtBlock) BelongsToFunc() bool {
+	return e.Parent != nil
+}
