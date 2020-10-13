@@ -8,7 +8,7 @@ type extBlock struct {
 	*ir.Block
 }
 
-func (e *extBlock) IsEndWithTerminator() bool {
+func (e *extBlock) HasTerminator() bool {
 	return e.Term != nil
 }
 

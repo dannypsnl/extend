@@ -10,7 +10,7 @@ import (
 
 func TestExtBlock_IsEndWithTerminator(t *testing.T) {
 	b := extend.Block(ir.NewBlock(""))
-	assert.False(t, b.IsEndWithTerminator())
+	assert.False(t, b.HasTerminator())
 	b.NewRet(nil)
-	assert.True(t, b.IsEndWithTerminator())
+	assert.True(t, b.HasTerminator())
 }
