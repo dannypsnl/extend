@@ -8,39 +8,45 @@ import (
 	"github.com/llir/llvm/ir/types"
 )
 
-// Module receives a ir.Module and returns its extension
-func Module(b *ir.Module) *ExtModule {
-	return &ExtModule{
-		Module:      b,
-		existedFunc: make(map[string]uint64),
+// NoDup receives a ir.Module and returns a NoDupModule
+// it also removes existed duplicates
+func NoDup(b *ir.Module) *NoDupModule {
+	m := &NoDupModule{
+		Module:    b,
+		existedId: make(map[string]uint64),
 	}
+	for _, g := range b.Globals {
+		g.SetName(m.autoNewName(g.Name()))
+	}
+	for _, f := range b.Funcs {
+		f.SetName(m.autoNewName(f.Name()))
+	}
+	return m
 }
 
-// ExtModule is the extension of ir.Module
-type ExtModule struct {
+// NoDupModule is the extension of ir.Module
+// it wraps NewFunc, NewGlobal, and NewGlobalDef, automatically renaming existed global identifier
+type NoDupModule struct {
 	*ir.Module
-	existedFunc map[string]uint64
+	existedId map[string]uint64
 }
 
-// NewFunc
-func (e *ExtModule) NewFunc(name string, ret types.Type, params ...*ir.Param) *ir.Func {
+func (e *NoDupModule) NewFunc(name string, ret types.Type, params ...*ir.Param) *ir.Func {
 	return e.Module.NewFunc(e.autoNewName(name), ret, params...)
 }
 
-// NewGlobal
-func (e *ExtModule) NewGlobal(name string, ty types.Type) *ir.Global {
+func (e *NoDupModule) NewGlobal(name string, ty types.Type) *ir.Global {
 	return e.Module.NewGlobal(e.autoNewName(name), ty)
 }
 
-// NewGlobalDef
-func (e *ExtModule) NewGlobalDef(name string, c constant.Constant) *ir.Global {
+func (e *NoDupModule) NewGlobalDef(name string, c constant.Constant) *ir.Global {
 	return e.Module.NewGlobalDef(e.autoNewName(name), c)
 }
 
 // autoNewName would automatically renaming duplicated global name via given name
-func (e ExtModule) autoNewName(name string) string {
-	suffix := e.existedFunc[name]
-	e.existedFunc[name]++
+func (e NoDupModule) autoNewName(name string) string {
+	suffix := e.existedId[name]
+	e.existedId[name]++
 	if suffix != 0 {
 		return fmt.Sprintf("%s.%d", name, suffix)
 	} else {
