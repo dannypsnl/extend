@@ -8,7 +8,7 @@ import (
 	"github.com/llir/llvm/ir/types"
 )
 
-// NoDup receives a ir.Module and returns a NoDupModule
+// NoDup receives a ir.Module and returns a NoDupModule.
 // it also removes existed duplicates
 func NoDup(b *ir.Module) *NoDupModule {
 	m := &NoDupModule{
@@ -24,8 +24,8 @@ func NoDup(b *ir.Module) *NoDupModule {
 	return m
 }
 
-// NoDupModule is the extension of ir.Module
-// it wraps NewFunc, NewGlobal, and NewGlobalDef, automatically renaming existed global identifier
+// NoDupModule is the extension of ir.Module.
+// It wraps NewFunc, NewGlobal, and NewGlobalDef, automatically renaming existed global identifier
 type NoDupModule struct {
 	*ir.Module
 	existedId map[string]uint64
