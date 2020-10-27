@@ -2,6 +2,9 @@
 
 ### Working
 
+* ExtBlock
+    * prevent overwrite terminator
+
 ### v0.1.0
 
 * NoDupModule
