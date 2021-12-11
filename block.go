@@ -97,3 +97,9 @@ func (e *ExtBlock) NewUnreachable() *ir.TermUnreachable {
 	e.setTerminator(term)
 	return term
 }
+
+func (e *ExtBlock) NewPhi(incs ...*ir.Incoming) *ir.InstPhi {
+	instPhi := ir.NewPhi(incs...)
+	e.Block.Insts = append([]ir.Instruction{instPhi}, e.Block.Insts...)
+	return instPhi
+}
