@@ -1,6 +1,8 @@
 package extend
 
 import (
+	"fmt"
+
 	"github.com/llir/llvm/ir"
 	"github.com/llir/llvm/ir/constant"
 	"github.com/llir/llvm/ir/value"
@@ -31,7 +33,7 @@ func (e *ExtBlock) BelongsToFunc() bool {
 
 func (e *ExtBlock) setTerminator(terminator ir.Terminator) {
 	if e.HasTerminator() {
-		panic("Block already has terminator")
+		panic(fmt.Sprintf("Block `%s` already has terminator", e.Block.Name()))
 	}
 	e.Term = terminator
 }
