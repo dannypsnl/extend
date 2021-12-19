@@ -2,6 +2,9 @@ package extend
 
 import (
 	"fmt"
+	"strings"
+
+	"github.com/dannypsnl/extend/enc"
 
 	"github.com/llir/llvm/ir"
 	"github.com/llir/llvm/ir/constant"
@@ -19,6 +22,7 @@ func Block(b *ir.Block) *ExtBlock {
 // * panic if users trying to add second terminator to block
 type ExtBlock struct {
 	*ir.Block
+	Phis []*ir.InstPhi
 }
 
 // HasTerminator checks the end of Block is a terminator or not
@@ -37,6 +41,27 @@ func (e *ExtBlock) setTerminator(terminator ir.Terminator) {
 	}
 	e.Term = terminator
 }
+
+func (block *ExtBlock) LLString() string {
+	buf := &strings.Builder{}
+	if block.IsUnnamed() {
+		fmt.Fprintf(buf, "%s\n", enc.LabelID(block.LocalID))
+	} else {
+		fmt.Fprintf(buf, "%s\n", enc.LabelName(block.LocalName))
+	}
+	for _, inst := range block.Phis {
+		fmt.Fprintf(buf, "\t%s\n", inst.LLString())
+	}
+	for _, inst := range block.Insts {
+		fmt.Fprintf(buf, "\t%s\n", inst.LLString())
+	}
+	if !block.HasTerminator() {
+		panic(fmt.Sprintf("missing terminator in basic block %q.\ncurrent instructions:\n%s", block.Name(), buf.String()))
+	}
+	fmt.Fprintf(buf, "\t%s", block.Term.LLString())
+	return buf.String()
+}
+
 func (e *ExtBlock) NewRet(x value.Value) *ir.TermRet {
 	term := ir.NewRet(x)
 	e.setTerminator(term)
@@ -100,6 +125,6 @@ func (e *ExtBlock) NewUnreachable() *ir.TermUnreachable {
 
 func (e *ExtBlock) NewPhi(incs ...*ir.Incoming) *ir.InstPhi {
 	instPhi := ir.NewPhi(incs...)
-	e.Block.Insts = append([]ir.Instruction{instPhi}, e.Block.Insts...)
+	e.Phis = append(e.Phis, instPhi)
 	return instPhi
 }
