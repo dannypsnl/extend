@@ -20,6 +20,7 @@ func Block(b *ir.Block) *ExtBlock {
 
 // ExtBlock is the extension of ir.Block, except several helper functions, it would
 // * panic if users trying to add second terminator to block
+// * automatically lift Phi instructions to the front of the block
 type ExtBlock struct {
 	*ir.Block
 	Phis []*ir.InstPhi
